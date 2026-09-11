@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vence la Procrastinación | Sebastián Chavarro Machado</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cian: #00E5FF;
+    --negro: #111111;
+    --gris: #f7f7f7;
+  }
+  *{margin:0; padding:0; box-sizing:border-box;}
+  body{
+    font-family: 'Montserrat', sans-serif;
+    background: #ffffff;
+    color: var(--negro);
+    line-height: 1.7;
+    font-weight: 400;
+  }
+  h1,h2,h3{color: var(--cian); font-weight: 700;}
+  h1{font-size: 2.6rem; font-weight: 900;}
+  h2{font-size: 2rem; margin-bottom: 1rem;}
+  h3{font-size: 1.3rem; margin-bottom: .5rem;}
+  p{color: var(--negro); font-weight: 400;}
+
+  /* NAV */
+  nav{
+    position: sticky; top:0; z-index: 100;
+    background: #fff;
+    border-bottom: 3px solid var(--cian);
+    padding: 1rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap;
+  }
+  nav .logo{color: var(--cian); font-weight: 900; font-size: 1.1rem; letter-spacing: 1px;}
+  nav ul{display: flex; gap: 1.2rem; list-style: none; flex-wrap: wrap;}
+  nav a{color: var(--negro); text-decoration: none; font-weight: 600; font-size: .85rem; transition: color .3s;}
+  nav a:hover{color: var(--cian);}
+
+  /* SECCIONES */
+  section{padding: 4rem 2rem; max-width: 1100px; margin: 0 auto;}
+  section.alt{background: var(--gris); max-width: 100%; padding: 4rem 2rem;}
+  section.alt > div{max-width: 1100px; margin: 0 auto;}
+
+  /* HERO */
+  .hero{text-align: center; padding: 5rem 2rem 3rem;}
+  .hero p{max-width: 700px; margin: 1rem auto; font-size: 1.1rem;}
+  .hero .linea{width: 80px; height: 5px; background: var(--cian); margin: 1.5rem auto;}
+
+  /* TARJETAS */
+  .cards{display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 1.5rem; margin-top: 2rem;}
+  .card{
+    border: 2px solid var(--cian);
+    border-radius: 14px;
+    padding: 1.8rem;
+    background: #fff;
+    transition: transform .3s, box-shadow .3s;
+  }
+  .card:hover{transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,229,255,.25);}
+  .card h3{color: var(--cian);}
+
+  /* TEST */
+  .pregunta{margin-bottom: 2rem; padding: 1.5rem; border-left: 5px solid var(--cian); background: var(--gris); border-radius: 8px;}
+  .pregunta p{font-weight: 600; margin-bottom: 1rem;}
+  .opciones label{
+    display: block; padding: .7rem 1rem; margin: .4rem 0;
+    border: 2px solid #ddd; border-radius: 8px;
+    cursor: pointer; transition: all .25s; font-size: .95rem;
+  }
+  .opciones label:hover{border-color: var(--cian);}
+  .opciones input{display: none;}
+  .opciones input:checked + span{font-weight: 700; color: var(--cian);}
+  .opciones label.checked{border-color: var(--cian); background: #e6feff;}
+
+  button.btn{
+    background: var(--cian); color: #fff; border: none;
+    padding: .9rem 2rem; font-family: 'Montserrat'; font-weight: 700;
+    font-size: 1rem; border-radius: 30px; cursor: pointer;
+    transition: transform .2s, box-shadow .3s;
+  }
+  button.btn:hover{transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,229,255,.4);}
+
+  #resultado{
+    margin-top: 2rem; padding: 2rem; border-radius: 14px;
+    background: #e6feff; border: 2px solid var(--cian); display: none;
+  }
+  #resultado h3{color: var(--cian); font-size: 1.5rem;}
+
+  /* TAREAS / GANTT */
+  .task-input{display: flex; gap: .8rem; flex-wrap: wrap; margin-bottom: 1.5rem;}
+  .task-input input, .task-input select{
+    padding: .8rem; border: 2px solid #ddd; border-radius: 8px;
+    font-family: 'Montserrat'; font-size: .95rem; flex: 1; min-width: 150px;
+  }
+  .task-input input:focus, .task-input select:focus{outline: none; border-color: var(--cian);}
+
+  ul.lista-tareas{list-style: none;}
+  ul.lista-tareas li{
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem; margin-bottom: .7rem;
+    background: var(--gris); border-radius: 10px;
+    transition: all .3s;
+  }
+  ul.lista-tareas li.done{opacity: .55; text-decoration: line-through;}
+
+  /* CHECK ANIMADO */
+  .check{
+    width: 26px; height: 26px; min-width: 26px;
+    border: 2px solid var(--cian); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .3s; background: #fff;
+  }
+  .check svg{width: 16px; height: 16px; stroke: #fff; stroke-width: 3; fill: none;
+    stroke-dasharray: 30; stroke-dashoffset: 30; transition: stroke-dashoffset .4s ease;}
+  .check.active{background: var(--cian); transform: scale(1.15);}
+  .check.active svg{stroke-dashoffset: 0;}
+
+  .tarea-info{flex: 1;}
+  .tarea-info small{color: #666; font-size: .8rem;}
+  .btn-borrar{
+    background: transparent; border: none; color: #ff4d4d;
+    font-size: 1.2rem; cursor: pointer; font-weight: 700;
+  }
+
+  /* GANTT */
+  .gantt-wrap{margin-top: 2rem; overflow-x: auto; padding-bottom: 1rem;}
+  .gantt{min-width: 600px;}
+  .gantt-row{display: flex; align-items: center; margin-bottom: .6rem;}
+  .gantt-label{width: 180px; font-size: .85rem; font-weight: 600; padding-right: 1rem;}
+  .gantt-bar-track{flex: 1; background: #eee; height: 26px; border-radius: 6px; position: relative;}
+  .gantt-bar{
+    position: absolute; height: 100%; background: var(--cian);
+    border-radius: 6px; transition: width .5s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8px; color: #fff; font-size: .75rem; font-weight: 700;
+  }
+  .gantt-fechas{display: flex; margin-left: 180px; font-size: .75rem; color: #666; justify-content: space-between; margin-bottom: 1rem;}
+
+  /* PROMPT BOX */
+  .prompt-box{
+    background: #0d1117; color: #c9d1d9; padding: 1.5rem;
+    border-radius: 12px; font-family: 'Courier New', monospace;
+    font-size: .85rem; margin-top: 1rem; overflow-x: auto;
+    border-left: 5px solid var(--cian);
+  }
+  .prompt-box span{color: var(--cian);}
+
+  /* FLOW */
+  .flow-intro{max-width: 750px; margin: 0 auto 2.5rem; text-align: center;}
+  .flow-intro p{font-size: 1.05rem;}
+
+  .flow-anim{
+    display: flex; justify-content: center; align-items: flex-end;
+    gap: 8px; height: 90px; margin: 2rem auto;
+  }
+  .flow-anim span{
+    display: block; width: 12px; border-radius: 8px;
+    background: var(--cian); animation: ola 1.4s ease-in-out infinite;
+    height: 30px;
+  }
+  .flow-anim span:nth-child(1){animation-delay: 0s;}
+  .flow-anim span:nth-child(2){animation-delay: .15s;}
+  .flow-anim span:nth-child(3){animation-delay: .3s;}
+  .flow-anim span:nth-child(4){animation-delay: .45s;}
+  .flow-anim span:nth-child(5){animation-delay: .6s;}
+  .flow-anim span:nth-child(6){animation-delay: .75s;}
+  .flow-anim span:nth-child(7){animation-delay: .9s;}
+  .flow-anim span:nth-child(8){animation-delay: 1.05s;}
+  @keyframes ola{
+    0%,100%{height: 30px; opacity:.5;}
+    50%{height: 80px; opacity:1;}
+  }
+
+  .flow-checklist{list-style: none; max-width: 600px; margin: 1.5rem auto;}
+  .flow-checklist li{
+    display: flex; align-items: center; gap: 1rem;
+    padding: .9rem 1.2rem; margin-bottom: .6rem;
+    background: #fff; border: 2px solid #eee; border-radius: 12px;
+    cursor: pointer; transition: all .3s; font-weight: 500;
+  }
+  .flow-checklist li:hover{border-color: var(--cian); transform: translateX(6px);}
+  .flow-checklist li.done{background: #e6feff; border-color: var(--cian);}
+  .flow-checklist li.done span.texto{color: var(--cian); font-weight: 700;}
+
+  .flow-checklist .check{
+    width: 26px; height: 26px; min-width: 26px;
+    border: 2px solid var(--cian); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; transition: all .3s;
+  }
+  .flow-checklist .check svg{
+    width: 16px; height: 16px; stroke: #fff; stroke-width: 3;
+    fill: none; stroke-dasharray: 30; stroke-dashoffset: 30;
+    transition: stroke-dashoffset .4s ease;
+  }
+  .flow-checklist li.done .check{background: var(--cian); transform: scale(1.15);}
+  .flow-checklist li.done .check svg{stroke-dashoffset: 0;}
+
+  .flow-cards{
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+    gap: 1.5rem; margin-top: 2rem;
+  }
+  .flow-cards .card{background: #fff;}
+  .flow-cards .card .icono{
+    font-size: 2rem; display: block; margin-bottom: .6rem;
+    animation: flotar 2.5s ease-in-out infinite;
+  }
+  .flow-cards .card:nth-child(2) .icono{animation-delay:.3s;}
+  .flow-cards .card:nth-child(3) .icono{animation-delay:.6s;}
+  .flow-cards .card:nth-child(4) .icono{animation-delay:.9s;}
+  @keyframes flotar{
+    0%,100%{transform: translateY(0);}
+    50%{transform: translateY(-8px);}
+  }
+
+  /* FLOWCHART */
+  .flow{display: flex; flex-direction: column; align-items: center; gap: .5rem; margin-top: 2rem;}
+  .flow-box{
+    border: 2px solid var(--cian); border-radius: 10px;
+    padding: 1rem 1.8rem; text-align: center; font-weight: 600;
+    background: #fff; min-width: 280px;
+  }
+  .flow-box.pregunta{background: #e6feff;}
+  .flow-box.fin{background: var(--cian); color: #fff;}
+  .flecha{color: var(--cian); font-size: 1.6rem; font-weight: 900;}
+
+  /* FOOTER */
+  footer{
+    background: #fff; border-top: 4px solid var(--cian);
+    text-align: center; padding: 2.5rem 1rem;
+  }
+  footer .credito{color: var(--cian); font-weight: 900; font-size: 1.2rem; letter-spacing: 2px;}
+  footer p{font-size: .85rem; color: #444; margin-top: .5rem;}
+
+  @media(max-width: 600px){
+    h1{font-size: 1.9rem;} h2{font-size: 1.5rem;}
+    nav ul{gap: .7rem;} nav a{font-size: .75rem;}
+    nav{padding: 1rem;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">⏱️ VENCE LA PROCRASTINACIÓN</div>
+  <ul>
+    <li><a href="#que-es">¿Qué es?</a></li>
+    <li><a href="#test">Test</a></li>
+    <li><a href="#organizador">Organizador</a></li>
+    <li><a href="#flow">Flow</a></li>
+    <li><a href="#flujo">Diagrama</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <h1>VENCE LA PROCRASTINACIÓN</h1>
+  <div class="linea"></div>
+  <p>Descubre qué tipo de procrastinación tienes, identifica tus dificultades y toma el control con herramientas prácticas.</p>
+</header>
+
+<!-- 1. QUÉ ES -->
+<section id="que-es">
+  <h2>1. ¿Qué es la procrastinación?</h2>
+  <p>La <strong>procrastinación</strong> es la acción de retrasar o postergar tareas importantes que requieren esfuerzo, reemplazándolas por actividades más placenteras, a pesar de saber que esa demora nos perjudica. <strong>No es pereza</strong>: es una falla en la regulación emocional.</p>
+  <div class="cards">
+    <div class="card">
+      <h3>🧠 En el cerebro</h3>
+      <p>El sistema límbico busca placer inmediato y evita el displacer. La corteza prefrontal planifica a largo plazo, pero es más lenta. Cuando hay ansiedad, gana el límbico.</p>
+    </div>
+    <div class="card">
+      <h3>🔁 El ciclo</h3>
+      <p>Tarea → ansiedad → evitación → alivio momentáneo → culpa → más ansiedad. Un círculo vicioso que se refuerza solo.</p>
+    </div>
+    <div class="card">
+      <h3>🎯 3 tipos</h3>
+      <p><strong>Retraso crónico:</strong> siempre "mañana lo hago".<br>
+      <strong>Distracción:</strong> empiezo pero me pierdo.<br>
+      <strong>Resistencia:</strong> rechazo interno hacia la tarea.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2. TEST -->
+<section id="test" class="alt">
+  <div>
+    <h2>2. Test: ¿Cuál tipo tengo?</h2>
+    <p>Responde con sinceridad. Al final sabrás en qué enfocarte.</p>
+    <form id="test-form"></form>
+    <button class="btn" onclick="calcularResultado()">Ver mi resultado</button>
+    <div id="resultado"></div>
+  </div>
+</section>
+
+<!-- 3. ORGANIZADOR -->
+<section id="organizador">
+  <h2>3. Mi Organizador de Tareas y Diagrama de Gantt</h2>
+  <p>Agrega tus tareas, asígnales una duración y visualiza tu progreso. Haz clic en el círculo para marcarlas como completadas ✨</p>
+
+  <div class="task-input">
+    <input type="text" id="task-name" placeholder="Nombre de la tarea...">
+    <select id="task-duration">
+      <option value="1">1 día</option>
+      <option value="2">2 días</option>
+      <option value="3" selected>3 días</option>
+      <option value="5">5 días</option>
+      <option value="7">7 días</option>
+    </select>
+    <button class="btn" onclick="agregarTarea()">+ Agregar</button>
+  </div>
+
+  <ul class="lista-tareas" id="lista-tareas"></ul>
+
+  <h3 style="margin-top:2.5rem;">📊 Diagrama de Gantt</h3>
+  <div class="gantt-wrap">
+    <div class="gantt-fechas"><span>Día 1</span><span>Día 7</span></div>
+    <div class="gantt" id="gantt"></div>
+  </div>
+
+  <h3 style="margin-top:2.5rem;">🤖 Prompt para organizarte con IA</h3>
+  <div class="prompt-box">
+    <span>Actúa como mi coach de productividad.</span> Tengo esta tarea: [DESCRIBIR TAREA].<br>
+    Divídela en micro-tareas de máximo 15 minutos cada una.<br>
+    Ordénalas por prioridad y dificultad.<br>
+    Créame una lista con fechas sugeridas y un mini diagrama de Gantt en texto.<br>
+    Incluye recordatorios de descanso cada 45 minutos.
+  </div>
+</section>
+
+<!-- 4. ESTADO DE FLOW -->
+<section id="flow" class="alt">
+  <div>
+    <h2>4. Estado de Flow: concentración total</h2>
+
+    <div class="flow-intro">
+      <p>
+        El <strong>Flow</strong> (o "experiencia óptima") es ese estado mental en el que estás
+        <strong>completamente absorto en una actividad</strong>: el tiempo vuela, la concentración es plena
+        y la tarea se siente natural y satisfactoria. Es lo opuesto a la procrastinación.
+      </p>
+    </div>
+
+    <div class="flow-anim" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <h3 style="text-align:center;">🎯 ¿Cómo entrar en Flow?</h3>
+    <ul class="flow-checklist" id="flow-checklist">
+      <li onclick="toggleFlow(this)">
+        <div class="check"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></div>
+        <span class="texto">Tener un objetivo claro de la sesión</span>
+      </li>
+      <li onclick="toggleFlow(this)">
+        <div class="check"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></div>
+        <span class="texto">Dificultad equilibrada con tu habilidad</span>
+      </li>
+      <li onclick="toggleFlow(this)">
+        <div class="check"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></div>
+        <span class="texto">Eliminar todas las distracciones digitales</span>
+      </li>
+      <li onclick="toggleFlow(this)">
+        <div class="check"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></div>
+        <span class="texto">Bloque de tiempo sin interrupciones (mín. 25 min)</span>
+      </li>
+      <li onclick="toggleFlow(this)">
+        <div class="check"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></div>
+        <span class="texto">Feedback inmediato: ver que avanzas</span>
+      </li>
+    </ul>
+
+    <h3 style="text-align:center; margin-top:2.5rem;">🛋️ Recomendaciones para tu espacio de Flow</h3>
+    <div class="flow-cards">
+      <div class="card">
+        <span class="icono">📵</span>
+        <h3>Sin pantallas intrusas</h3>
+        <p>Celular en otra habitación o en modo avión. Notificaciones desactivadas.</p>
+      </div>
+      <div class="card">
+        <span class="icono">💡</span>
+        <h3>Luz y orden</h3>
+        <p>Luz natural o cálida, mesa despejada, solo lo necesario a la vista.</p>
+      </div>
+      <div class="card">
+        <span class="icono">🌿</span>
+        <h3>Confort sensorial</h3>
+        <p>Temperatura agradable, agua o snack, música instrumental o silencio.</p>
+      </div>
+      <div class="card">
+        <span class="icono">🚪</span>
+        <h3>Señal de "no molestar"</h3>
+        <p>Avisa a quienes conviven contigo. Usa auriculares como señal visual.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. FLUJO -->
+<section id="flujo">
+  <h2>5. Diagrama de flujo: identifica tus dificultades</h2>
+  <div class="flow">
+    <div class="flow-box pregunta">¿Tengo claro QUÉ debo hacer?</div>
+    <div class="flecha">↓ NO → definir objetivo SMART</div>
+    <div class="flow-box pregunta">¿Sé CÓMO hacerlo?</div>
+    <div class="flecha">↓ NO → buscar recursos / ayuda</div>
+    <div class="flow-box pregunta">¿Tengo TIEMPO disponible?</div>
+    <div class="flecha">↓ NO → reorganizar agenda / micro-tareas</div>
+    <div class="flow-box pregunta">¿Tengo ESPACIO adecuado?</div>
+    <div class="flecha">↓ NO → crear zona de Flow</div>
+    <div class="flow-box pregunta">¿La tarea me MOTIVA?</div>
+    <div class="flecha">↓ NO → ajustar dificultad / conectar con meta</div>
+    <div class="flow-box pregunta">¿Empiezo ahora?</div>
+    <div class="flecha">↓ NO → regla 2 min / Pomodoro</div>
+    <div class="flow-box fin">✅ ¡TAREA EN MARCHA!</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="credito">SEBASTIÁN CHAVARRO MACHADO</div>
+  <p>Proyecto sobre la procrastinación y cómo combatirla · 2025</p>
+</footer>
+
+<script>
+/* ---------- TEST ---------- */
+const preguntas = [
+  {p:"¿Cuándo postergas, qué pasa primero?", ops:[
+    {t:"Digo 'mañana lo hago' una y otra vez", v:"cronico"},
+    {t:"Empiezo, pero a los 5 minutos ya estoy en el celular", v:"distraccion"},
+    {t:"Solo de pensar en la tarea siento rechazo o ansiedad", v:"resistencia"}
+  ]},
+  {p:"¿Qué te frena realmente?", ops:[
+    {t:"Nunca encuentro el momento, siempre hay algo más urgente", v:"cronico"},
+    {t:"No logro concentrarme, todo me saca del foco", v:"distraccion"},
+    {t:"La tarea me parece muy difícil, muy aburrida o sin sentido", v:"resistencia"}
+  ]},
+  {p:"¿Qué haces mientras procrastinas?", ops:[
+    {t:"Cualquier otra cosa, menos la tarea importante", v:"cronico"},
+    {t:"Redes, videos, notificaciones, multitarea", v:"distraccion"},
+    {t:"Evito incluso pensar en ella, siento malestar", v:"resistencia"}
+  ]},
+  {p:"¿Cómo te sientes después de postergar?", ops:[
+    {t:"Culpable y ansioso por el tiempo perdido", v:"cronico"},
+    {t:"Frustrado por no poder concentrarme", v:"distraccion"},
+    {t:"Con alivio momentáneo, pero vacío", v:"resistencia"}
+  ]}
+];
+
+const form = document.getElementById('test-form');
+preguntas.forEach((q,i)=>{
+  const div = document.createElement('div');
+  div.className = 'pregunta';
+  let html = `<p>${i+1}. ${q.p}</p><div class="opciones">`;
+  q.ops.forEach((o,j)=>{
+    html += `<label onclick="marcar(this)">
+      <input type="radio" name="p${i}" value="${o.v}">
+      <span>${o.t}</span>
+    </label>`;
+  });
+  html += `</div>`;
+  div.innerHTML = html;
+  form.appendChild(div);
+});
+
+function marcar(label){
+  const name = label.querySelector('input').name;
+  document.querySelectorAll(`input[name="${name}"]`).forEach(inp=>{
+    inp.parentElement.classList.remove('checked');
+  });
+  label.classList.add('checked');
+}
+
+function calcularResultado(){
+  const conteo = {cronico:0, distraccion:0, resistencia:0};
+  let respondidas = 0;
+  preguntas.forEach((q,i)=>{
+    const sel = document.querySelector(`input[name="p${i}"]:checked`);
+    if(sel){ conteo[sel.value]++; respondidas++; }
+  });
+  const res = document.getElementById('resultado');
+  if(respondidas < preguntas.length){
+    res.style.display = 'block';
+    res.innerHTML = `<h3>⚠️ Responde todas las preguntas</h3><p>Te faltan ${preguntas.length - respondidas} por contestar.</p>`;
+    return;
+  }
+  const ganador = Object.keys(conteo).reduce((a,b)=> conteo[a] >= conteo[b] ? a : b);
+  const info = {
+    cronico: {t:"RETRASO CRÓNICO", d:"Tu enemigo es la falta de estructura. Enfócate en micro-tareas, listas y diagramas de Gantt. Empieza por lo más pequeño.", e:"🗂️"},
+    distraccion: {t:"DISTRACCIÓN", d:"Tu enemigo es el entorno digital. Enfócate en bloques de tiempo, Pomodoro, modo avión y crear un espacio de Flow.", e:"📵"},
+    resistencia: {t:"RESISTENCIA", d:"Tu enemigo es tu relación emocional con la tarea. Ajusta la dificultad, dale sentido o recupera el control.", e:"🧠"}
+  };
+  res.style.display = 'block';
+  res.innerHTML = `<h3>${info[ganador].e} Tu tipo dominante: ${info[ganador].t}</h3>
+    <p><strong>¿En qué enfocarte?</strong> ${info[ganador].d}</p>
+    <p style="margin-top:.8rem;font-size:.9rem;">Conteo: Retraso ${conteo.cronico} · Distracción ${conteo.distraccion} · Resistencia ${conteo.resistencia}</p>`;
+}
+
+/* ---------- TAREAS ---------- */
+let tareas = [];
+
+function agregarTarea(){
+  const nombre = document.getElementById('task-name').value.trim();
+  const duracion = parseInt(document.getElementById('task-duration').value);
+  if(!nombre){ alert('Escribe un nombre para la tarea'); return; }
+  tareas.push({id: Date.now(), nombre, duracion, done:false});
+  document.getElementById('task-name').value = '';
+  renderizar();
+}
+
+function toggleTarea(id){
+  const t = tareas.find(x=>x.id===id);
+  t.done = !t.done;
+  renderizar();
+}
+
+function borrarTarea(id){
+  tareas = tareas.filter(x=>x.id!==id);
+  renderizar();
+}
+
+function renderizar(){
+  const ul = document.getElementById('lista-tareas');
+  ul.innerHTML = '';
+  tareas.forEach(t=>{
+    const li = document.createElement('li');
+    if(t.done) li.classList.add('done');
+    li.innerHTML = `
+      <div class="check ${t.done?'active':''}" onclick="toggleTarea(${t.id})">
+        <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>
+      </div>
+      <div class="tarea-info">
+        <div>${t.nombre}</div>
+        <small>Duración: ${t.duracion} día(s)</small>
+      </div>
+      <button class="btn-borrar" onclick="borrarTarea(${t.id})">✕</button>
+    `;
+    ul.appendChild(li);
+  });
+  renderizarGantt();
+}
+
+function renderizarGantt(){
+  const g = document.getElementById('gantt');
+  g.innerHTML = '';
+  if(tareas.length === 0){
+    g.innerHTML = '<p style="color:#888;font-size:.9rem;">Agrega tareas para ver tu diagrama de Gantt.</p>';
+    return;
+  }
+  const totalDias = 7;
+  tareas.forEach((t,idx)=>{
+    const inicio = Math.min(idx, totalDias - t.duracion);
+    const left = (inicio / totalDias) * 100;
+    const width = (t.duracion / totalDias) * 100;
+    const row = document.createElement('div');
+    row.className = 'gantt-row';
+    row.innerHTML = `
+      <div class="gantt-label">${t.nombre}</div>
+      <div class="gantt-bar-track">
+        <div class="gantt-bar" style="left:${left}%; width:${width}%;">
+          ${t.duracion}d
+        </div>
+      </div>
+    `;
+    g.appendChild(row);
+  });
+}
+
+/* ---------- CHECKLIST FLOW ---------- */
+function toggleFlow(el){
+  el.classList.toggle('done');
+}
+
+renderizar();
+</script>
+</body>
+</html>
